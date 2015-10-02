@@ -1,5 +1,6 @@
 import cPickle as pic
 import collections
+import urllib2
 
 def loadGo():
     """
@@ -70,12 +71,12 @@ def loadLit():
     >6) SGDID (mandatory)       - the SGDID, unique database identifier, for the gene/feature
     """
     SGDID_to_lit = collections.defaultdict(list)
-    with open("gene_literature.tab.txt", "r") as litFile:
-        for lines in litFile:
-            lineList = lines.split('\t')
-            if not SGDID_to_lit[lineList[5]]:
-                SGDID_to_lit[lineList[5]] = []
-            SGDID_to_lit[lineList[5]] = lineList[1]
+    litFile = urllib2.urlopen("http://downloads.yeastgenome.org/curation/literature/gene_literature.tab")
+    for lines in litFile:
+        lineList = lines.split('\t')
+        if not SGDID_to_lit[lineList[5]]:
+            SGDID_to_lit[lineList[5]] = []
+        SGDID_to_lit[lineList[5]] = lineList[1]
     pic.dump(SGDID_to_lit, open( "SGDID_to_lit.pkl", "wb" ))
 
 
@@ -95,14 +96,13 @@ def loadSlimTerm():
     7) Feature type (mandatory)     - a description of the sequence feature, such as ORF or tRNA
     """
     SGDID_to_goSlim = collections.defaultdict(list)
-    with open("go_slim_mapping.tab.txt", "r") as slimFile:
-        for lines in slimFile:
-            lineList = lines.split('\t')
-            if not SGDID_to_goSlim[lineList[2]]:
-                SGDID_to_goSlim[lineList[2]] = []
-            SGDID_to_goSlim[lineList[2]].append(lineList[4])
+    slimFile = urllib2.urlopen("http://downloads.yeastgenome.org/curation/literature/go_slim_mapping.tab")
+    for lines in slimFile:
+        lineList = lines.split('\t')
+        if not SGDID_to_goSlim[lineList[2]]:
+            SGDID_to_goSlim[lineList[2]] = []
+        SGDID_to_goSlim[lineList[2]].append(lineList[4])
     pic.dump(SGDID_to_goSlim, open( "SGDID_to_goSlim.pkl", "wb" ))
-    print SGDID_to_goSlim
 
 loadGo()
 loadLit()
