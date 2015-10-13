@@ -11,6 +11,28 @@ proteinGroupsDataFrame = pandas.DataFrame.from_csv('proteinGroups.txt', sep='\t'
 PhosphoSTYsitesDataFrame = pandas.DataFrame.from_csv('Phospho(STY)Sites.txt', sep='\t')
 peptideDataFrame = pandas.DataFrame.from_csv('peptides.txt', sep='\t')
 
+def denormalize(dfin, col):
+    df = dfin
+    drp = []
+    new_entries = []
+    for i in reversed(xrange(0, df.shape[0])):
+        ids = df.iloc[i][col]
+        if type(ids) is not str:
+            continue
+        tok = ids.split(";")
+        if len(tok) > 1:
+            idx = [] # needs indices of other columns with multiple values
+            # for t in tok:
+            for j in xrange(0, len(tok)):
+                new_entry = df.iloc[i]
+                new_entry[col] = tok[j]
+                # for k in idx:
+                    # set new_entry columns named in idx to df.iloc[i][k].split(";")[j]
+                new_entries.append(new_entry)
+            drp.append(i)
+    df = df.drop(df.index[drp])
+    df = df.append(new_entries)
+    return df
 
 def makeScatterPlot(proteinGroupsDataFrame):
     #makes scatter plot of Control vs TPK1 ko... 
